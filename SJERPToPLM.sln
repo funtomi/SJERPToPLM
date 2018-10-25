@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SJERPToPLM", "SJERPToPLM\SJERPToPLM.csproj", "{5C3A5B4D-F2CA-490D-9182-ADE50AFA1E85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERPToPLMImplement", "ERPToPLMImplement\ERPToPLMImplement.csproj", "{DFF92252-FBDA-46D0-9B21-6E60B0B7702D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5C3A5B4D-F2CA-490D-9182-ADE50AFA1E85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C3A5B4D-F2CA-490D-9182-ADE50AFA1E85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C3A5B4D-F2CA-490D-9182-ADE50AFA1E85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C3A5B4D-F2CA-490D-9182-ADE50AFA1E85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFF92252-FBDA-46D0-9B21-6E60B0B7702D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFF92252-FBDA-46D0-9B21-6E60B0B7702D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFF92252-FBDA-46D0-9B21-6E60B0B7702D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFF92252-FBDA-46D0-9B21-6E60B0B7702D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

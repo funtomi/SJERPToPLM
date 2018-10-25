@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<config>
+  <URL>http://192.168.91.134:8080/acc/services/ERPService</URL>
+  <name>ad</name>
+  <password>saw123456</password>
+  <clientId>1003</clientId>
+</config>
