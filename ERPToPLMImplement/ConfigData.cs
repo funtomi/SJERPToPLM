@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 using System.Xml;
 
 namespace ERPToPLMImplement {
-    class ConfigData {
+    public class ConfigData {
         public ConfigData(XmlDocument doc) {
             if (doc==null) {
                 throw new ArgumentNullException("doc");
             }
             InitData(doc);
         }
-        private static string PATH_CONFIG = @"config";
-        private static string PATH_URL = @"URL";
-        private static string PATH_NAME = @"name";
-        private static string PATH_PWD = @"password";
-        private static string PATH_CLTID = @"clientId";
+        private static string PATH_CONFIG = "config";
+        private static string PATH_URL = "URL";
+        private static string PATH_NAME = "name";
+        private static string PATH_PWD = "password";
+        private static string PATH_CLTID = "clientId";
+        private static string PATH_CLASSES = "classes";
         #region 配置字段
         
         /// <summary>
@@ -51,6 +52,17 @@ namespace ERPToPLMImplement {
             get { return _clientId; }
         }
         private int _clientId;
+
+        public int Uid {
+            get { return _uid; }
+            set { _uid = value; }
+        }
+        private int _uid;
+
+        public List<string> Classes {
+            get { return _classes; }
+        }
+        private List<string> _classes;
         #endregion
 
         /// <summary>
@@ -73,7 +85,8 @@ namespace ERPToPLMImplement {
             _loginPassword = pwdNode == null || string.IsNullOrEmpty(pwdNode.InnerText) ? "" : pwdNode.InnerText;
             var cltIdName = configNode.SelectSingleNode(PATH_CLTID);
             _clientId = cltIdName == null || string.IsNullOrEmpty(cltIdName.InnerText) ? 0 : Convert.ToInt32(cltIdName.InnerText);
-        
+            var classesNode = configNode.SelectSingleNode(PATH_CLASSES);
+            _classes = classesNode == null || string.IsNullOrEmpty(classesNode.InnerText) ? null : classesNode.InnerText.Split(',').ToList<string>();
         }
     }
 }

@@ -1,0 +1,5 @@
+E:\定制插件\SJERPToPLM\SJERPToPLM\PLMConnection\obj\Debug\PLMConnection.csprojResolveAssemblyReference.cache
+E:\定制插件\SJERPToPLM\SJERPToPLM\Export\PLMConnection.dll
+E:\定制插件\SJERPToPLM\SJERPToPLM\Export\PLMConnection.pdb
+E:\定制插件\SJERPToPLM\SJERPToPLM\PLMConnection\obj\Debug\PLMConnection.dll
+E:\定制插件\SJERPToPLM\SJERPToPLM\PLMConnection\obj\Debug\PLMConnection.pdb

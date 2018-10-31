@@ -1,0 +1,11 @@
+E:\定制插件\SJERPToPLM\SJERPToPLM\ERPConnection\bin\Debug\ERPConnection.exe.config
+E:\定制插件\SJERPToPLM\SJERPToPLM\ERPConnection\bin\Debug\ERPConnection.exe
+E:\定制插件\SJERPToPLM\SJERPToPLM\ERPConnection\bin\Debug\ERPConnection.pdb
+E:\定制插件\SJERPToPLM\SJERPToPLM\ERPConnection\bin\Debug\ERPToPLMImplement.dll
+E:\定制插件\SJERPToPLM\SJERPToPLM\ERPConnection\bin\Debug\ERPToPLMImplement.pdb
+E:\定制插件\SJERPToPLM\SJERPToPLM\Export\ERPConnection.exe.config
+E:\定制插件\SJERPToPLM\SJERPToPLM\Export\ERPConnection.exe
+E:\定制插件\SJERPToPLM\SJERPToPLM\Export\ERPConnection.pdb
+E:\定制插件\SJERPToPLM\SJERPToPLM\ERPConnection\obj\Debug\ERPConnection.csprojResolveAssemblyReference.cache
+E:\定制插件\SJERPToPLM\SJERPToPLM\ERPConnection\obj\Debug\ERPConnection.exe
+E:\定制插件\SJERPToPLM\SJERPToPLM\ERPConnection\obj\Debug\ERPConnection.pdb
