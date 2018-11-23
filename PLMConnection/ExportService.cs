@@ -1,5 +1,6 @@
 ﻿using ERPToPLMImplement;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -53,7 +54,7 @@ namespace PLMConnection {
             //var s =_matchDatas.FindAll(p=>p.PlmClass=="dd");
             List<MatchData> datas = _matchDatas.FindAll(p => ModelContext.MetaModel.IsChild(p.PlmClass, _bItem.ClassName));
             foreach (var matchData in datas) {
-                if (matchData.PlmRelation == null) {
+                if (string.IsNullOrEmpty(matchData.RelationName)) {
                     var fdValue = BuildFieldValueArray(matchData);
                     if (!ERPServiceHelper.Instance.SaveBaseWithConfig(matchData.BaseId, matchData.Addkeyvalue, fdValue, out errText)) {
                         return false;
@@ -90,7 +91,7 @@ namespace PLMConnection {
             if (matchData == null) {
                 throw new ArgumentNullException("matchData");
             }
-            if (itemIds ==null) {
+            if (itemIds == null) {
                 itemIds = new List<string>();
             }
             errText = "";
@@ -98,25 +99,31 @@ namespace PLMConnection {
                 throw new ArgumentNullException("matchData.RelationName");
             }
             var relations = GetLinks(bItem, matchData.RelationName);
-            if (relations==null||relations.Count==0) {
+            if (relations == null || relations.Count == 0) {
                 return true;
             }
-            for (int i = 0; i < relations.BizItems.Count; i++) {
-                var item = relations.BizItems[i] as DEBusinessItem;
-                var rlt = relations.RelationList[i] as DERelation2;
-                if (item==null||rlt==null) {
+            foreach (var rlts in relations) {
+                if (rlts == null || rlts.Count == 0) {
                     continue;
                 }
-                if (itemIds.Contains(item.Id)) {
-                    continue;
+                for (int i = 0; i < rlts.BizItems.Count; i++) {
+                    var item = rlts.BizItems[i] as DEBusinessItem;
+                    var rlt = rlts.RelationList[i] as DERelation2;
+                    if (item == null || rlt == null) {
+                        continue;
+                    }
+                    if (itemIds.Contains(item.Id)) {
+                        continue;
+                    }
+                    var fdValue = BuildFieldValueArrayWithRlt(matchData, item, rlt, bItem);
+                    if (!ERPServiceHelper.Instance.SaveBaseWithConfig(matchData.BaseId, matchData.Addkeyvalue, fdValue, out errText)) {
+                        return false;
+                    }
+                    //itemIds.Add(item.Id);
+                    //return ImportRelations(item, matchData, ref itemIds, out errText);
                 }
-                var fdValue = BuildFieldValueArrayWithRlt(matchData, item, rlt, bItem);
-                if (!ERPServiceHelper.Instance.SaveBaseWithConfig(matchData.BaseId, matchData.Addkeyvalue, fdValue, out errText)) {
-                    return false;
-                }
-                itemIds.Add(item.Id);
-                return ImportRelations(item, matchData, ref itemIds, out errText);
             }
+
             return true;
         }
 
@@ -166,18 +173,47 @@ namespace PLMConnection {
             return fdValue;
         }
 
+        private List<DERelationBizItemList> GetLinks(DEBusinessItem item, string relation) {
+            if (item==null) {
+                throw new ArgumentNullException("item");
+            }
+            if (string.IsNullOrEmpty(relation)) {
+                throw new ArgumentNullException("relation");
+            }
+            List<DERelationBizItemList> lists = new List<DERelationBizItemList>();
+            GetLink(item, relation, ref lists);
+            if (lists==null) {
+                return lists;
+            }
+            return lists;
+        }
 
-
-        public DERelationBizItemList GetLinks(DEBusinessItem item, string relation) {
+        public void GetLink(DEBusinessItem item, string relation, ref List<DERelationBizItemList> lists) {
+            if (item == null) {
+                return;
+            }
+            if (lists == null || lists.Count == 0) {
+                lists = new List<DERelationBizItemList>();
+            }
             DERelationBizItemList relationBizItemList = item.Iteration.LinkRelationSet.GetRelationBizItemList(relation);
             if (relationBizItemList == null) {
                 try {
                     relationBizItemList = PLItem.Agent.GetLinkRelationItems(item.Iteration.Oid, item.Master.ClassName, relation, ClientData.LogonUser.Oid, ClientData.UserGlobalOption);
                 } catch {
-                    return null;
+                    return;
                 }
             }
-            return relationBizItemList;
+            if (relationBizItemList == null || relationBizItemList.Count == 0) {
+                return;
+            }
+            lists.Add(relationBizItemList);
+            foreach (var rltItem in relationBizItemList.BizItems) {
+                var item2 = rltItem as DEBusinessItem;
+                if (item2 == null) {
+                    continue;
+                }
+                GetLink(item2, relation, ref lists);
+            }
         }
 
         private string[] BuildFieldValueArray(MatchData matchData) {

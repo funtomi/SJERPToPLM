@@ -4,3 +4,6 @@
 *.dll
 *.dll
 *.dll
+Export/ERPToPLMImplement.dll
+*.dll
+*.pdb

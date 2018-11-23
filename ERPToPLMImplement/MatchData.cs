@@ -73,7 +73,7 @@ namespace ERPToPLMImplement {
             var relationNode = doc.SelectSingleNode(PATH_PLMRELATION);
             if (relationNode!=null&&relationNode.ChildNodes!=null&&relationNode.ChildNodes.Count>0) {
                 var relationNameNode = relationNode.SelectSingleNode(PATH_RELATIONNAME);
-                _relationName = relationNode == null || string.IsNullOrEmpty(relationNode.InnerText) ? "" : relationNode.InnerText;
+                _relationName = relationNameNode == null || string.IsNullOrEmpty(relationNameNode.InnerText) ? "" : relationNameNode.InnerText;
                 var rightRelationNode = relationNode.SelectSingleNode(PATH_RIGHTRELATION);
                 _rightRelation = rightRelationNode == null || string.IsNullOrEmpty(rightRelationNode.InnerText) ? "" : rightRelationNode.InnerText;
             }
