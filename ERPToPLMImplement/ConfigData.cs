@@ -19,8 +19,16 @@ namespace ERPToPLMImplement {
         private static string PATH_PWD = "password";
         private static string PATH_CLTID = "clientId";
         private static string PATH_CLASSES = "classes";
+        private static string PATH_DEBUG = "Debug";
         #region 配置字段
-        
+
+        /// <summary>
+        /// 是否调试状态
+        /// </summary>
+        public bool IsDebug {
+            get { return _isDebug; }
+        }
+        private bool _isDebug;
         /// <summary>
         /// url
         /// </summary>
@@ -87,6 +95,8 @@ namespace ERPToPLMImplement {
             _clientId = cltIdName == null || string.IsNullOrEmpty(cltIdName.InnerText) ? 0 : Convert.ToInt32(cltIdName.InnerText);
             var classesNode = configNode.SelectSingleNode(PATH_CLASSES);
             _classes = classesNode == null || string.IsNullOrEmpty(classesNode.InnerText) ? null : classesNode.InnerText.Split(',').ToList<string>();
+            var debugNode = configNode.SelectSingleNode(PATH_DEBUG);
+            _isDebug = debugNode == null || string.IsNullOrEmpty(debugNode.InnerText) ? false : Convert.ToBoolean(debugNode.InnerText);
         }
     }
 }

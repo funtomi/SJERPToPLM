@@ -3,20 +3,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using Thyt.TiPLM.Common;
 using Thyt.TiPLM.Common.Interface.Addin;
 using Thyt.TiPLM.DEL.Operation;
 using Thyt.TiPLM.DEL.Product;
 using Thyt.TiPLM.PLL.Admin.DataModel;
+using Thyt.TiPLM.PLL.FileService;
 using Thyt.TiPLM.PLL.Operation;
+using Thyt.TiPLM.PLL.Product2;
 using Thyt.TiPLM.UIL.Common;
 using Thyt.TiPLM.UIL.Common.Operation;
 using Thyt.TiPLM.UIL.Controls;
+using Thyt.TiPLM.UIL.Product.Common;
+using Thyt.TiPLM.UIL.Product.Common.UserControls;
 
 namespace PLMConnection {
     public class AddExportPlugin : IAddinClientEntry, IAutoExec {
         public Delegate d_AfterReleased { get; set; }
         public Delegate d_AfterDeleted { get; set; }
         public static DEBusinessItem _item = null;
+
+        //20181126 add by kexp 类似创建功能
+        public Delegate d_RefreshRelation { get; set; }
 
         #region 插入操作内容
 
@@ -44,6 +52,8 @@ namespace PLMConnection {
             #region 绑定定版后事件
             this.d_AfterReleased = new PLMBizItemDelegate(AfterItemReleased);
             BizItemHandlerEvent.Instance.D_AfterReleased = (PLMBizItemDelegate)Delegate.Combine(BizItemHandlerEvent.Instance.D_AfterReleased, this.d_AfterReleased);
+            this.d_RefreshRelation = new PLMRefreshRelationDelegate(this.RefreshRelation);
+            BizItemHandlerEvent.Instance.D_RefreshRelation = (PLMRefreshRelationDelegate)Delegate.Combine(BizItemHandlerEvent.Instance.D_RefreshRelation,this.d_RefreshRelation);
             #endregion
 
             #region 添加右键菜单【导入到ERP】
@@ -58,6 +68,7 @@ namespace PLMConnection {
             }
             #endregion
         }
+
 
         /// <summary>
         /// 添加操作类
@@ -274,6 +285,27 @@ namespace PLMConnection {
         //    return (Id == "_SPLITTER");
         //}
         #endregion
+        #endregion
+
+        #region 刷新关联
+
+        private void RefreshRelation(object parent, string relationName) {
+    //        DEBusinessItem item = parent as DEBusinessItem;
+    //        DERelationBizItemList list = PLItem.Agent.GetLinkRelationItems(item.IterOid, item.ClassName, relationName, ClientData.LogonUser.Oid, new ObjectNavigateContext().Option);
+    //        DERelationBizItemList s = item.Iteration.LinkRelationSet.RelationBizItemLists[relationName] as DERelationBizItemList;
+    //        //var newItem =
+    //        List<object> items = new List<object> {
+    //    item
+    //};
+    //        ArrayList files = PLFileService.Agent.GetFiles(Guid.Empty);
+    //        var fileOid = ((DESecureFile)(((DEBusinessItem)s.BizItems[0]).FileList[0])).FileOid;
+    //        //var fileOid = ((Thyt.TiPLM.DEL.Product.DESecureFile)((new System.Collections.ArrayList.ArrayListDebugView(((Thyt.TiPLM.DEL.Product.DEBusinessItem)((new System.Collections.ArrayList.ArrayListDebugView(((Thyt.TiPLM.DEL.Product.DERelationBizItemList)(s)).bizItems)).Items[0])).FileList)).Items[0])).FileOid;
+    //        string p = FSClientUtil.DownloadFile(fileOid, "ClaRel_DOWNLOAD");
+    //        //PLMOperationArgs args = new PLMOperationArgs(FrmLogon.PLMProduct.ToString(), PLMLocation.None.ToString(), items, ClientData.UserGlobalOption.CloneAsLocal());
+    //        //BizOperationHelper.Instance.Clone(null, args);
+    //        var path = ConstConfig.GetTempfilePath();
+            
+        }
         #endregion
 
     }

@@ -7,3 +7,6 @@
 Export/ERPToPLMImplement.dll
 *.dll
 *.pdb
+*.cache
+*.dll
+*.cache

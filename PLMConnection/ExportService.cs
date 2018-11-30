@@ -10,6 +10,7 @@ using Thyt.TiPLM.DEL.Product;
 using Thyt.TiPLM.PLL.Admin.DataModel;
 using Thyt.TiPLM.PLL.Product2;
 using Thyt.TiPLM.UIL.Common;
+using Thyt.TiPLM.UIL.Controls;
 
 namespace PLMConnection {
    public class ExportService {
@@ -23,7 +24,7 @@ namespace PLMConnection {
 
         private DEBusinessItem _bItem;
         private List<MatchData> _matchDatas;
-
+        private static string SYS_NUMBER = "sys_ralation_number";
 
         private void InitData(XmlDocument doc) {
             if (doc == null) {
@@ -102,20 +103,28 @@ namespace PLMConnection {
             if (relations == null || relations.Count == 0) {
                 return true;
             }
-            foreach (var rlts in relations) {
-                if (rlts == null || rlts.Count == 0) {
+            int number = 0;
+            foreach (DERelationBizItemList lsit in relations.Values) {
+                if (lsit==null||lsit.Count==0) {
                     continue;
                 }
-                for (int i = 0; i < rlts.BizItems.Count; i++) {
-                    var item = rlts.BizItems[i] as DEBusinessItem;
-                    var rlt = rlts.RelationList[i] as DERelation2;
+                number += lsit.Count;
+            }
+            matchData.RelationNum = number;
+            foreach (KeyValuePair<DEBusinessItem,DERelationBizItemList> rlts in relations) {
+                if (rlts.Value.Count == 0) {
+                    continue;
+                }
+                for (int i = 0; i < rlts.Value.BizItems.Count; i++) {
+                    var item = rlts.Value.BizItems[i] as DEBusinessItem;
+                    var rlt = rlts.Value.RelationList[i] as DERelation2; 
                     if (item == null || rlt == null) {
                         continue;
                     }
                     if (itemIds.Contains(item.Id)) {
                         continue;
                     }
-                    var fdValue = BuildFieldValueArrayWithRlt(matchData, item, rlt, bItem);
+                    var fdValue = BuildFieldValueArrayWithRlt(matchData, item, rlt, rlts.Key);
                     if (!ERPServiceHelper.Instance.SaveBaseWithConfig(matchData.BaseId, matchData.Addkeyvalue, fdValue, out errText)) {
                         return false;
                     }
@@ -142,45 +151,76 @@ namespace PLMConnection {
             }
             var fdValue = new string[matchData.FieldValues.Count];
             for (int i = 0; i < fdValue.Length; i++) {
+                if (matchData.FieldValues[i] != null && !string.IsNullOrEmpty(matchData.FieldValues[i].Plmfield)) {
+                    if (matchData.FieldValues[i].Plmfield.ToUpper() == SYS_NUMBER.ToUpper()) {
+                        //fdValue[i] = matchData.RelationNum.ToString();
+                        fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, matchData.RelationNum.ToString());
+                        // MessageBoxPLM.Show(matchData.RelationNum.ToString());
+                        continue;
+                    }
+                }
                 var classType = string.IsNullOrEmpty(matchData.FieldValues[i].PlmType) ? "0" : matchData.FieldValues[i].PlmType;
+                if (matchData.FieldValues[i] == null || string.IsNullOrEmpty(matchData.FieldValues[i].Plmfield)) {
+                    continue;
+                }
+                string plmValue = "";
                 switch (classType) {
                     default:
-                    case "0"://当前实体
-                        if (matchData.FieldValues[i] != null && !string.IsNullOrEmpty(matchData.FieldValues[i].Plmfield) && matchData.FieldValues[i].Plmfield.ToUpper() == "ID") {
-                            fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, item.Id);
-                        } else {
-                            fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, item.GetAttrValue(item.ClassName, matchData.FieldValues[i].Plmfield.ToUpper()));
-                        }
+                    case "0"://当前实体 
+                        plmValue = GetAttrWithName(item, matchData.FieldValues[i].Plmfield);
+                        fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, plmValue);
                         break;
                     case "1"://关联属性
                         fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, rlt.GetAttrValue(matchData.FieldValues[i].Plmfield.ToUpper()));
                         break;
                     case "2"://父实体属性
-                        if (matchData.FieldValues[i] != null && !string.IsNullOrEmpty(matchData.FieldValues[i].Plmfield) && matchData.FieldValues[i].Plmfield.ToUpper() == "ID") {
-                            fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, parentItem.Id);
-                        } else {
-                            fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, parentItem.GetAttrValue(parentItem.ClassName, matchData.FieldValues[i].Plmfield.ToUpper()));
-                        } break;
+                        plmValue = GetAttrWithName(parentItem, matchData.FieldValues[i].Plmfield);
+                        fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, plmValue);
+                        break;
                     case "3"://最上层实体属性
-                        if (matchData.FieldValues[i] != null && !string.IsNullOrEmpty(matchData.FieldValues[i].Plmfield) && matchData.FieldValues[i].Plmfield.ToUpper() == "ID") {
-                            fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, _bItem.Id);
-                        } else {
-                            fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, _bItem.GetAttrValue(_bItem.ClassName, matchData.FieldValues[i].Plmfield.ToUpper()));
-                        }
+                        plmValue = GetAttrWithName(_bItem, matchData.FieldValues[i].Plmfield);
+                        fdValue[i] = string.Format("@{0}={1}", matchData.FieldValues[i].Erpfield, plmValue);
                         break;
                 }
             }
-            return fdValue;
+                return fdValue;
         }
 
-        private List<DERelationBizItemList> GetLinks(DEBusinessItem item, string relation) {
+       /// <summary>
+       /// 获取PLM属性值
+       /// </summary>
+       /// <param name="item"></param>
+       /// <param name="attrName"></param>
+       /// <returns></returns>
+        private string GetAttrWithName(DEBusinessItem item,string attrName) {
+            if (string.IsNullOrEmpty(attrName)) {
+                throw new ArgumentNullException("Plmfield");
+            }
+            if (item==null) {
+                throw new ArgumentNullException("item");
+            }
+            if (attrName.ToUpper()=="ID") {//代号
+                return item.Id;
+            }
+            if (attrName.ToUpper()=="REVISION") {//版本号
+                return item.LastRevision.ToString();
+            }
+            var val = item.GetAttrValue(item.ClassName, attrName.ToUpper());
+            if (val==null) {
+                return "";
+            }
+            return val.ToString();
+        }
+
+        private Dictionary<DEBusinessItem,DERelationBizItemList> GetLinks(DEBusinessItem item, string relation) {
             if (item==null) {
                 throw new ArgumentNullException("item");
             }
             if (string.IsNullOrEmpty(relation)) {
                 throw new ArgumentNullException("relation");
             }
-            List<DERelationBizItemList> lists = new List<DERelationBizItemList>();
+
+            Dictionary<DEBusinessItem, DERelationBizItemList> lists = new Dictionary<DEBusinessItem, DERelationBizItemList>();
             GetLink(item, relation, ref lists);
             if (lists==null) {
                 return lists;
@@ -188,12 +228,15 @@ namespace PLMConnection {
             return lists;
         }
 
-        public void GetLink(DEBusinessItem item, string relation, ref List<DERelationBizItemList> lists) {
+        public void GetLink(DEBusinessItem item, string relation, ref Dictionary<DEBusinessItem,DERelationBizItemList> lists) {
             if (item == null) {
                 return;
             }
+            if (lists.Keys.Contains(item)) {
+                return;
+            }
             if (lists == null || lists.Count == 0) {
-                lists = new List<DERelationBizItemList>();
+                lists = new Dictionary<DEBusinessItem, DERelationBizItemList>();
             }
             DERelationBizItemList relationBizItemList = item.Iteration.LinkRelationSet.GetRelationBizItemList(relation);
             if (relationBizItemList == null) {
@@ -206,7 +249,7 @@ namespace PLMConnection {
             if (relationBizItemList == null || relationBizItemList.Count == 0) {
                 return;
             }
-            lists.Add(relationBizItemList);
+            lists.Add(item,relationBizItemList);
             foreach (var rltItem in relationBizItemList.BizItems) {
                 var item2 = rltItem as DEBusinessItem;
                 if (item2 == null) {

@@ -66,6 +66,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Export\Thyt.TiPLM.PLL.Admin.DataModel.DLL</HintPath>
     </Reference>
+    <Reference Include="Thyt.TiPLM.PLL.FileService, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Export\Thyt.TiPLM.PLL.FileService.DLL</HintPath>
+    </Reference>
     <Reference Include="Thyt.TiPLM.PLL.Operation, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Export\Thyt.TiPLM.PLL.Operation.DLL</HintPath>

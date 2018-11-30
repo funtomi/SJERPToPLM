@@ -24,6 +24,11 @@ namespace ERPToPLMImplement {
 
         #region match节点的参数
 
+        public int RelationNum {
+            get { return _relationNum; }
+            set { _relationNum = value; }
+        }
+        private int _relationNum = 0;
         public int BaseId {
             get { return _baseId; }
         }

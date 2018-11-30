@@ -186,11 +186,29 @@ namespace ERPToPLMImplement {
                 args[5] = keyvalue;
                 args[6] = fieldvalues;
                 object result = WebServiceHelper.InvokeWebService(_configData.Url, "saveBase", args);
-                string err = "参数：";
-                for (int i = 0; i < args.Length; i++) {
-                    err += args[i].ToString() + ",";
+                #region debug
+                if (ConfigData.IsDebug) {
+                    string err = "参数：";
+                    for (int i = 0; i < args.Length; i++) {
+                        if (args[i]==null) {
+                            continue;
+                        }
+                        err += args[i].ToString() + ",";
+                    }
+                    err += " fieldValuse:";
+                    if (fieldvalues!=null&&fieldvalues.Length>0) {
+                        for (int i = 0; i < fieldvalues.Length; i++) {
+                            if (fieldvalues[i]==null) {
+                                continue;
+                            }
+                            err += fieldvalues[i].ToString() +",";
+                        }
+                    }
+                    MessageBoxPLM.Show(err + "/结果：" + result.ToString());
                 }
-                MessageBoxPLM.Show(err+"/结果：" + result.ToString());
+               
+                #endregion
+                
                 return GetErrText(result,out errText);
             } catch (Exception) {
                 throw;
