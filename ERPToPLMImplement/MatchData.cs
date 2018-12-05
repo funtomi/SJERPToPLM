@@ -29,6 +29,7 @@ namespace ERPToPLMImplement {
             set { _relationNum = value; }
         }
         private int _relationNum = 0;
+
         public int BaseId {
             get { return _baseId; }
         }

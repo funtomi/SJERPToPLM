@@ -1,16 +1,12 @@
 ﻿using ERPToPLMImplement;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using Thyt.TiPLM.DEL.Product;
 using Thyt.TiPLM.PLL.Admin.DataModel;
 using Thyt.TiPLM.PLL.Product2;
 using Thyt.TiPLM.UIL.Common;
-using Thyt.TiPLM.UIL.Controls;
 
 namespace PLMConnection {
    public class ExportService {

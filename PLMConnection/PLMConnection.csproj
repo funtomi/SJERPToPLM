@@ -78,6 +78,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Export\Thyt.TiPLM.PLL.Product2.DLL</HintPath>
     </Reference>
+    <Reference Include="Thyt.TiPLM.UIL.ArchivManage, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Export\Thyt.TiPLM.UIL.ArchivManage.dll</HintPath>
+    </Reference>
     <Reference Include="Thyt.TiPLM.UIL.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Export\Thyt.TiPLM.UIL.Common.DLL</HintPath>
@@ -97,6 +101,7 @@
     <Compile Include="ExportHandlerHelper.cs" />
     <Compile Include="ExportService.cs" />
     <Compile Include="ExportToERPFilter.cs" />
+    <Compile Include="NewItemManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -53,6 +53,7 @@
     <Compile Include="ConfigData.cs" />
     <Compile Include="ERPServiceHelper.cs" />
     <Compile Include="ErrData.cs" />
+    <Compile Include="ExtendRelationData.cs" />
     <Compile Include="FieldValueData.cs" />
     <Compile Include="ImportPLMToERP.cs" />
     <Compile Include="LoginData.cs" />

@@ -20,6 +20,8 @@ namespace ERPToPLMImplement {
         private static string PATH_CLTID = "clientId";
         private static string PATH_CLASSES = "classes";
         private static string PATH_DEBUG = "Debug";
+        private static string PATH_EXTEND_RELATIONS = "ExtendRelations";
+        private static string PATH_EXTEND_RELATION = "ExtendRelation";
         #region 配置字段
 
         /// <summary>
@@ -71,6 +73,11 @@ namespace ERPToPLMImplement {
             get { return _classes; }
         }
         private List<string> _classes;
+
+        public List<ExtendRelationData> ExtendRelations {
+            get { return _extendRelations; }
+        }
+        private List<ExtendRelationData> _extendRelations;
         #endregion
 
         /// <summary>
@@ -97,6 +104,28 @@ namespace ERPToPLMImplement {
             _classes = classesNode == null || string.IsNullOrEmpty(classesNode.InnerText) ? null : classesNode.InnerText.Split(',').ToList<string>();
             var debugNode = configNode.SelectSingleNode(PATH_DEBUG);
             _isDebug = debugNode == null || string.IsNullOrEmpty(debugNode.InnerText) ? false : Convert.ToBoolean(debugNode.InnerText);
+            _extendRelations = GetExtendRelations(configNode);
+        }
+
+
+        private List<ExtendRelationData> GetExtendRelations(XmlNode configNode) {
+            if (configNode==null||configNode.ChildNodes==null||configNode.ChildNodes.Count==0) {
+                throw new ArgumentNullException("configNode");
+            }
+            var relationsNode = configNode.SelectSingleNode(PATH_EXTEND_RELATIONS);
+            if (relationsNode==null||relationsNode.ChildNodes==null||relationsNode.ChildNodes.Count==0) {
+                return null;
+            }
+            var relationNodes = relationsNode.SelectNodes(PATH_EXTEND_RELATION);
+            if (relationNodes==null||relationNodes.Count==0) {
+                return null;
+            }
+            List<ExtendRelationData> list = new List<ExtendRelationData>();
+            foreach (XmlNode item in relationNodes) {
+                ExtendRelationData data = new ExtendRelationData(item);
+                list.Add(data);
+            }
+            return list;
         }
     }
 }

@@ -2,20 +2,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using Thyt.TiPLM.Common;
 using Thyt.TiPLM.Common.Interface.Addin;
 using Thyt.TiPLM.DEL.Operation;
 using Thyt.TiPLM.DEL.Product;
 using Thyt.TiPLM.PLL.Admin.DataModel;
-using Thyt.TiPLM.PLL.FileService;
 using Thyt.TiPLM.PLL.Operation;
-using Thyt.TiPLM.PLL.Product2;
 using Thyt.TiPLM.UIL.Common;
-using Thyt.TiPLM.UIL.Common.Operation;
 using Thyt.TiPLM.UIL.Controls;
-using Thyt.TiPLM.UIL.Product.Common;
-using Thyt.TiPLM.UIL.Product.Common.UserControls;
 
 namespace PLMConnection {
     public class AddExportPlugin : IAddinClientEntry, IAutoExec {
@@ -290,22 +283,21 @@ namespace PLMConnection {
         #region 刷新关联
 
         private void RefreshRelation(object parent, string relationName) {
-    //        DEBusinessItem item = parent as DEBusinessItem;
-    //        DERelationBizItemList list = PLItem.Agent.GetLinkRelationItems(item.IterOid, item.ClassName, relationName, ClientData.LogonUser.Oid, new ObjectNavigateContext().Option);
-    //        DERelationBizItemList s = item.Iteration.LinkRelationSet.RelationBizItemLists[relationName] as DERelationBizItemList;
-    //        //var newItem =
-    //        List<object> items = new List<object> {
-    //    item
-    //};
-    //        ArrayList files = PLFileService.Agent.GetFiles(Guid.Empty);
-    //        var fileOid = ((DESecureFile)(((DEBusinessItem)s.BizItems[0]).FileList[0])).FileOid;
-    //        //var fileOid = ((Thyt.TiPLM.DEL.Product.DESecureFile)((new System.Collections.ArrayList.ArrayListDebugView(((Thyt.TiPLM.DEL.Product.DEBusinessItem)((new System.Collections.ArrayList.ArrayListDebugView(((Thyt.TiPLM.DEL.Product.DERelationBizItemList)(s)).bizItems)).Items[0])).FileList)).Items[0])).FileOid;
-    //        string p = FSClientUtil.DownloadFile(fileOid, "ClaRel_DOWNLOAD");
-    //        //PLMOperationArgs args = new PLMOperationArgs(FrmLogon.PLMProduct.ToString(), PLMLocation.None.ToString(), items, ClientData.UserGlobalOption.CloneAsLocal());
-    //        //BizOperationHelper.Instance.Clone(null, args);
-    //        var path = ConstConfig.GetTempfilePath();
+            var extends = ERPServiceHelper.Instance.ConfigData.ExtendRelations;
+            if (extends==null||extends.Count==0) {
+                return;
+            }
+            foreach (var relation in extends) {
+                if (relation.RelationName==relationName) {
+                    DEBusinessItem item = parent as DEBusinessItem;
+                    NewItemManager manager = new NewItemManager(item, relationName,relation.OrderSeq,relation.PartRelationName,relation.PartClassName);
+                    manager.CreateNewItemWithParent();
+                    return;
+                }
+            }
             
         }
+         
         #endregion
 
     }
