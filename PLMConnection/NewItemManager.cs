@@ -18,72 +18,49 @@ using Thyt.TiPLM.UIL.Product.Common.UserControls;
 
 namespace PLMConnection {
     class NewItemManager {
-        public NewItemManager(DEBusinessItem parentItem, string relationName, string seqAttrName,string partRelationName,string partClassName) {
+        public NewItemManager(DEBusinessItem parentItem, string relationName,ExtendRelationData extendData) {
             #region 参数检查
             if (parentItem == null) {
                 throw new ArgumentNullException("parentItem");
             }
             if (string.IsNullOrEmpty(relationName)) {
                 throw new ArgumentNullException("relationName");
-            }
-            if (string.IsNullOrEmpty(seqAttrName)) {
-                throw new ArgumentNullException("seqAttrName");
+            } 
+            if (extendData==null) {
+                throw new ArgumentException("extendData");
             }
             #endregion
             _parentItem = parentItem;
             _currentRelationName = relationName;
-            _seqAttrName = seqAttrName;
-            _partRelationName = partRelationName;
-            _partClassName = partClassName;
+            _extendData = extendData;
         }
 
-        private string _seqAttrName;
         private DEBusinessItem _parentItem;
         private string _currentRelationName;
-        private string _partRelationName;
-        private string _partClassName;
+        private ExtendRelationData _extendData;
         //private int _bizNumber;
 
         internal void CreateNewItemWithParent() {
-            //获取当前对象的连接
-            //DERelationBizItemList list =  _parentItem.Iteration.LinkRelationSet.RelationBizItemLists[_currentRelationName] as DERelationBizItemList;
-            //if (list == null || list.Count == 0) {
+            //获取当前对象的连接 
                 DERelationBizItemList list = PLItem.Agent.GetLinkRelationItems(_parentItem.IterOid, _parentItem.ClassName, _currentRelationName, ClientData.LogonUser.Oid, new ObjectNavigateContext().Option);
-            //}
-            //var newItem =
-                List<object> items = FindChildrenWithSeq(list, _seqAttrName);//连接中的标准产品
+         
+                List<object> items = FindChildrenWithSeq(list, _extendData.OrderSeq);//连接中的标准产品
             if (items==null||items.Count==0) {
                 return;
             }
-            RemoveLink(items);
-            //ArrayList files = PLFileService.Agent.GetFiles(Guid.Empty);
-            //var fileOid = ((DESecureFile)(((DEBusinessItem)s.BizItems[0]).FileList[0])).FileOid;
-            //var fileOid = ((Thyt.TiPLM.DEL.Product.DESecureFile)((new System.Collections.ArrayList.ArrayListDebugView(((Thyt.TiPLM.DEL.Product.DEBusinessItem)((new System.Collections.ArrayList.ArrayListDebugView(((Thyt.TiPLM.DEL.Product.DERelationBizItemList)(s)).bizItems)).Items[0])).FileList)).Items[0])).FileOid;
-            //string p = FSClientUtil.DownloadFile(fileOid, "ClaRel_DOWNLOAD");
+            RemoveLink(items); 
             PLMOperationArgs args = new PLMOperationArgs(FrmLogon.PLMProduct.ToString(), PLMLocation.None.ToString(), items, ClientData.UserGlobalOption.CloneAsLocal());
             var newItems =BizOperationHelper.Instance.Clone(null, args);
             if (newItems==null||newItems.Count==0) {
                 return;
-            }
-            //items = FindChildrenWithSeq(list, _seqAttrName);//连接中的标准产品
-            //if (items == null || items.Count == 0) {
-            //    return;
-            //} 
-            //var path = ConstConfig.GetTempfilePath();
+            } 
             var folder = CreateTempFolder();
             if (folder == null) {
                 return;
             }
-            AddNewLink(newItems); 
-            //var tItem = newItems[0] as DEBusinessItem;
+            AddNewLink(newItems);  
             CreateRelationPart(folder,newItems);
-            SetShortCut(newItems, folder);
-            
-            
-            //DEPSOption psOption = PLMClipboard.GetPSOption();
-
-            
-            //PLItem.Agent.UpdateLinkRelations(_parentItem.MasterOid, list.RelationList, ClientData.LogonUser.Oid, psOption);
+            SetShortCut(newItems, folder); 
         }
 
         private void CreateRelationPart(DEFolder2 folder,List<IBizItem> items) {
@@ -96,8 +73,8 @@ namespace PLMConnection {
                     continue;
                 }
                 //创建相关项目
-                DEMetaClassEx classEx = ModelContext.MetaModel.GetClassEx(_partClassName);
-                DEMetaRelation relation = ModelContext.MetaModel.GetRelation(_partRelationName);
+                DEMetaClassEx classEx = ModelContext.MetaModel.GetClassEx(_extendData.PartClassName);
+                DEMetaRelation relation = ModelContext.MetaModel.GetRelation(_extendData.PartRelationName);
                 PropertyPageContent input = new PropertyPageContent(classEx, null, ClientData.UserGlobalOption, folder, null, relation, PropertyPageMode.COMPOSITE, item);
                 FrmItemFactory3 factory = new FrmItemFactory3();
                 factory.SetInput(input);
@@ -117,13 +94,48 @@ namespace PLMConnection {
                 if (item==null) {
                     continue;
                 }
-                int index = list2.Count; 
-                item.Iteration.SetAttrValue(_seqAttrName,++index);
+                int index = list2.Count;
+                item.Iteration.SetAttrValue(_extendData.OrderSeq, ++index);
+                SetInheritAttr(_parentItem, item,_extendData.FromParentlists);
                 PLItem.Agent.UpdateItemIteration(item.Iteration, ClientData.LogonUser.Oid, ClientData.UserGlobalOption);
                 var rltItem = ArchiveManageCommon.AddNewRelItem(item, _currentRelationName, _parentItem);
                 list2.AddRelationItem(rltItem); 
             }
             PLItem.UpdateLinkRelations(_parentItem, _currentRelationName, ClientData.LogonUser.Oid, ClientData.UserGlobalOption); 
+        }
+
+        private void SetInheritAttr(DEBusinessItem parentItem, DEBusinessItem childItem, List<InheritAttrData> inheritDatas) {
+            if (parentItem == null || childItem == null || inheritDatas == null || inheritDatas.Count == 0) {
+                return;
+            }
+            foreach (InheritAttrData data in inheritDatas) {
+                if (data == null) {
+                    continue;
+                }
+
+                var value = GetValue(parentItem, data);
+                if (value == null) {
+                    continue;
+                }
+                childItem.Iteration.SetAttrValue(data.To, value);
+            }
+            PLItem.Agent.UpdateItemIteration(childItem.Iteration, ClientData.LogonUser.Oid, ClientData.UserGlobalOption);
+        }
+
+        private object GetValue(DEBusinessItem parentItem, InheritAttrData data) {
+            if (parentItem==null||data==null) {
+                return null;
+            }
+            if (string.IsNullOrEmpty(data.From)) {
+                return null;
+            }
+            var attr = data.From.Split('.');
+            if (attr==null||attr.Length<2) {
+                var value = parentItem.GetAttrValue(parentItem.ClassName, attr[0]);
+                return value;
+            }
+            var value1 = parentItem.GetAttrValue(attr[0], attr[1]);
+            return value1;
         }
 
 

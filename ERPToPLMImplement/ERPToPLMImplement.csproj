@@ -56,6 +56,7 @@
     <Compile Include="ExtendRelationData.cs" />
     <Compile Include="FieldValueData.cs" />
     <Compile Include="ImportPLMToERP.cs" />
+    <Compile Include="InheritAttrData.cs" />
     <Compile Include="LoginData.cs" />
     <Compile Include="MatchData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

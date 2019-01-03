@@ -290,7 +290,7 @@ namespace PLMConnection {
             foreach (var relation in extends) {
                 if (relation.RelationName==relationName) {
                     DEBusinessItem item = parent as DEBusinessItem;
-                    NewItemManager manager = new NewItemManager(item, relationName,relation.OrderSeq,relation.PartRelationName,relation.PartClassName);
+                    NewItemManager manager = new NewItemManager(item, relationName, relation);
                     manager.CreateNewItemWithParent();
                     return;
                 }
