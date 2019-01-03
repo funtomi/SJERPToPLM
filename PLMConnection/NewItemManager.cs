@@ -53,14 +53,15 @@ namespace PLMConnection {
             var newItems =BizOperationHelper.Instance.Clone(null, args);
             if (newItems==null||newItems.Count==0) {
                 return;
-            } 
-            var folder = CreateTempFolder();
-            if (folder == null) {
-                return;
             }
+            //20190103 modified by kexp:隐藏这些文件夹，当合同明细添加到一定数量的时候，个人文件夹下的目录就会非常多，不方便使用。
+            //var folder = CreateTempFolder();
+            //if (folder == null) {
+            //    return;
+            //}
             AddNewLink(newItems);  
-            CreateRelationPart(folder,newItems);
-            SetShortCut(newItems, folder); 
+            CreateRelationPart(null,newItems);
+            //SetShortCut(newItems, folder); 
         }
 
         private void CreateRelationPart(DEFolder2 folder,List<IBizItem> items) {
